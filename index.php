@@ -15,13 +15,13 @@ require 'db.php';
 $dadosEntradaJson = file_get_contents("php://input");
 $dadosEntradaJsonParaArray = json_decode($dadosEntradaJson, true);
 
-if (!isset($dadosEntradaJsonParaArray['data_source']['table']) || !isset($input['data_source']['columns'])) {
+if (!isset($dadosEntradaJsonParaArray['data_source']['table']) || !isset($dadosEntradaJsonParaArray['data_source']['columns'])) {
     echo json_encode(["error" => "parametro inválido"]);
     exit;
 }
 
-$regexDeVerificacaoDeSQLInjectionTabela = preg_replace("/[^a-zA-Z0-9_]/", "", $input['data_source']['table']);
-$regexDeVerificacaoDeSQLInjectionColuna = array_map(fn($col) => preg_replace("/[^a-zA-Z0-9_]/", "", $col), $input['data_source']['columns']);
+$regexDeVerificacaoDeSQLInjectionTabela = preg_replace("/[^a-zA-Z0-9_]/", "", $dadosEntradaJsonParaArray['data_source']['table']);
+$regexDeVerificacaoDeSQLInjectionColuna = array_map(fn($col) => preg_replace("/[^a-zA-Z0-9_]/", "", $col), $dadosEntradaJsonParaArray['data_source']['columns']);
 $colunaArrayParaString = implode(", ", $regexDeVerificacaoDeSQLInjectionColuna);
 
 $queryInicial = "SELECT $colunaArrayParaString FROM $regexDeVerificacaoDeSQLInjectionTabela";
@@ -32,7 +32,7 @@ if (isset($dadosEntradaJsonParaArray['data_source']['filters']) &&  is_array($da
     foreach ($dadosEntradaJsonParaArray['data_source']['filters'] as $filtro => $filtroEntrada) {
         $regexDeVerificacaoDeSQLInjectionFiltro = preg_replace("/[^a-zA-Z0-9_]/", "", $filtro);
         $queryFiltros[] = "$regexDeVerificacaoDeSQLInjectionFiltro = :$regexDeVerificacaoDeSQLInjectionFiltro";
-        $arrFiltroEntrada[$queryFiltros] = $filtroEntrada;
+        $arrFiltroEntrada[$regexDeVerificacaoDeSQLInjectionFiltro] = $filtroEntrada;
     }
 }
 
