@@ -1,0 +1,19 @@
+
+{
+    "data_source": {
+        "table": "users",
+        "columns": [
+            "id",
+            "name",
+            "email"
+        ],
+        "filters": {
+            "status": "active"
+        }
+    },
+    "response_format": {
+        "type": "structured",
+        "wrapper": "data"
+    }
+}
+
